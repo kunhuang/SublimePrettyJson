@@ -4,6 +4,7 @@ import decimal
 import sys
 import os
 import re
+import ast
 from xml.etree import ElementTree
 from xml.dom import minidom
 
@@ -49,9 +50,19 @@ class PrettyJsonBaseCommand(sublime_plugin.TextCommand):
 
     @staticmethod
     def json_loads(selection):
-        return json.loads(selection,
-                          object_pairs_hook=OrderedDict,
-                          parse_float=decimal.Decimal)
+        try:
+            return json.loads(selection,
+                              object_pairs_hook=OrderedDict,
+                              parse_float=decimal.Decimal)
+        except:
+            try:
+                # python variable
+                return ast.literal_eval(selection)
+            except:
+                # make sure it's throwing the right exception info
+                return json.loads(selection,
+                                  object_pairs_hook=OrderedDict,
+                                  parse_float=decimal.Decimal)
 
     @staticmethod
     def json_dumps(obj):
